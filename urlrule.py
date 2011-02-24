@@ -6,7 +6,8 @@ positive_rules = [
 		]
 
 negative_rules = [
-		re.compile(r"(\.jpg|\.jpeg|\.png|\.gif)$",re.I)
+		re.compile(r"(\.jpg|\.jpeg|\.png|\.gif)$",re.I),
+		re.compile(r"#\w*$")
 		]
 
 filter = re.compile(r"text/html")

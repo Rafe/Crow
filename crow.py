@@ -79,9 +79,12 @@ class Crow:
 				log(str(e))
 			except Exception as e:
 				log(str(e))
+		return self.stat()
+
+	def stat(self):
 		MB = lambda x:x/1024/1024
-		log("total %.2f MB data in database" % MB(self.pipe.size()))
-		log("%.2f MB saved in this session" % MB(self.pipe.session_size()))
+		log("[Crow%d]total %.2f MB data in database" % (self.cid,MB(self.pipe.size())))
+		log("[Crow%d]%.2f MB saved in this session" % (self.cid,MB(self.pipe.session_size())))
 		return self
 
 	def parse_link(self,base_url,html):
@@ -96,19 +99,23 @@ class Crow:
 	def async_start(self,count):
 		self.async = True
 		reactor.callInThread(self.start,count)
+	
+	@staticmethod
+	def run():
+		reactor.run()
 		
 
 def main():
-
+	#the hardcoded search query:
 	gs = GoogleSearch("computer")
 	gs.result_per_page=10
 	results = gs.get_results()
 
 	for r in results:
 		Crow(r.url).select(lambda s:s.findAll("a",href=True)
-				).to(SqlitePipeline()).async_start(10)
+				).to(SqlitePipeline()).async_start(50)
 
-	reactor.run()
+	Crow.run()
 	f.close()
 
 if __name__ == "__main__":

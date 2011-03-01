@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	
+		<title>Search</title>
+		<style type="text/css" media="screen">
+			article{
+				-webkit-border-radius: 10px;
+				display:block;
+				width:900px;
+				height:50px;
+				padding:5px;
+				margin:5px;
+				background-color:#EEE;
+				-webkit-transform-origin:0%;
+				-webkit-animation-name: jumpin;
+				-webkit-animation-duration: 1s;
+				-webkit-animation-iteration-count: 1;
+				-webkit-animation-timing-function: ease-in-out;	
+			}
+
+			@-webkit-keyframes jumpin{
+				0%{
+					margin-left:900px;
+					-webkit-transform: rotateY(90deg);
+				}
+				100%{
+					margin-left:5px;
+					-webkit-transform: rotateY(0deg);
+				}
+			}
+		</style>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" charset="utf-8">
+			$(function(){
+					$("#submit").click(function(){
+						$("#more").hide();
+						$("session").empty();
+						search(1);
+					});
+					$("#more").click(function(){
+						page = parseInt($("#more").attr("rel"));
+						search(page);
+						$("#more").attr("rel",page+1);
+					});
+			});
+
+			var search = function(page){
+				var query = $("#search").val();
+					$.get('search/'+query+'?page='+page,function(data){
+						var session = $("session");
+						appendData(data,session);
+					});
+			};
+
+			var appendData= function(data,session){
+						var keyframes = 0;
+						for(i in data){
+								var url = data[i]['url'],
+									 	title = data[i]['title'];
+								article = $("<article><a href='"+url+"'><h3>"+title+"</h3></a></article>");
+								setTimeout(function(session,article){
+										return function(){
+											session.append(article);
+										}
+									}(session,article),keyframes);
+								keyframes+=100;
+						}
+						setTimeout("$('#more').show()",keyframes+1000);
+			}
+		</script>
+	</head>
+	<body>
+		<div>
+			<h1 id="title">Search!!</h1>
+			<input id="search" type="text"/>
+			<button id="submit">Search</button>
+		</div>
+		<session id="result"></session>
+		<div>
+			<button id="more" style="display:none" rel="0">more</button>
+		</div>
+	</body>
+</html>

@@ -1,8 +1,8 @@
 import sqlite3
 import datetime
 import sys
-import md5
 from log import log
+import setting
 
 class DummyPipeline:
 	def process(self,url,page):
@@ -17,7 +17,7 @@ class DummyPipeline:
 class SqlitePipeline:
 
 	def __init__(self):
-		self.conn = sqlite3.connect('DB')
+		self.conn = sqlite3.connect(setting.get("DB"))
 		self.readed = 0
 		try:
 			self.conn.execute("""

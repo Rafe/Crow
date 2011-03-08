@@ -69,7 +69,6 @@ class Crow:
 			depth = link.depth
 			try:
 				log("[Crow%d crawling]%s in depth:%d " %(self.cid,url,depth))
-				#getPage(url).addCalback(self.pipe.process)
 				html = urllib2.urlopen(url,timeout=5)
 				type = html.headers.get("content-type")
 				if urlrule.filter.search(type) and html.getcode() == 200:
@@ -91,7 +90,7 @@ class Crow:
 		soup = BeautifulSoup(html)
 		self.pipe.process(self,base_url,soup)
 		depth = base_url.depth + 1
-		for ref in self.rule(soup):
+		for ref in soup.findAll(self.rule,href=True):
 			url = urlrule.get_abs_url(base_url.url,ref["href"])
 			if urlrule.match(url):
 				self.queue.add_link(Link(url,depth))
@@ -112,8 +111,7 @@ def main():
 	results = gs.get_results()
 
 	for r in results:
-		Crow(r.url).select(lambda s:s.findAll("a",href=True)
-				).to(SqlitePipeline()).async_start(50)
+		Crow(r.url).select("a").to(SqlitePipeline()).async_start(50)
 
 	Crow.run()
 	f.close()
